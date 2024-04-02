@@ -11,45 +11,65 @@ public class UserRegistrationService
 {
     public List<string> Users { get; set; } = new List<string>();
 
-    public bool AddUser(string username, string password, string email)
+    public string AddUser(string username, string password, string email)
     {
         if (username.Length < 5 || username.Length > 20)
         {
             Console.WriteLine("Username must be between 5 and 20 characters long.");
-            return false;
+            return "Username must be between 5 and 20 characters long.";
+        }
+        if (Users.Contains(username))
+        {
+            Console.WriteLine("Expected user registration to fail due to invalid characters in username.");
+            return "Expected user registration to fail due to invalid characters in username.";
         }
 
         if (Users.Contains(username))
         {
             Console.WriteLine("Username already exists.");
-            return false;
+            return "Username already exists.";
+        }
+        if (!Password(password))
+        {
+            Console.WriteLine("Password lenght must be over 8 characters and must include special sign");
+            return "Password lenght must be over 8 characters and must include special sign";
+        }
+        if (!CheckEmail(email))
+        {
+            Console.WriteLine("Email must include @gmail.com");
+            return "Email must include @gmail.com";
         }
 
         User newUser = new User(username, password, email);
         Users.Add(username);
         Console.WriteLine("User added successfully.");
-        return true;
-    }
-    public bool IsAlphanumeric(string str)
-    {
-        foreach (char c in str)
-        {
-            if (!char.IsLetterOrDigit(c))
-            {
-                return false;
-            }
-        }
-        return true;
+        return "User added successfully.";
     }
     public bool Password(string password)
     {
-        string specialChar = @"|!#$%&/()=?»«@£§€{}.-;'<>_,";
-        foreach (var item in specialChar)
+        if (password is not null && password.Length >= 8 && CheckIsCharacterSpecial(password))
         {
-            if (password.Contains(item)) return true;
+            return true;
+        }
+        return false;
+
+    }
+    private bool CheckIsCharacterSpecial(string password)
+    {
+        foreach (char c in password)
+        {
+            if (!char.IsLetterOrDigit(c))
+            {
+                return true;
+            }
         }
         return false;
     }
+    public bool IsAlphanumeric(string str)
+    {
+        return str.All(char.IsLetterOrDigit);
+    }
+
     public bool CheckEmail(string email)
     {
         if (email.EndsWith("@gmail.com"))
@@ -58,7 +78,7 @@ public class UserRegistrationService
         }
         else
         {
-            throw new ArgumentException("Email must end with ´@gmail.com'");
+            return false;
         }
     }
 }
